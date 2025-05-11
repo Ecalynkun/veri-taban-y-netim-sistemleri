@@ -1,0 +1,42 @@
+SELECT a.Model, a.Marka, s.Sfiyat
+FROM Arac a
+JOIN Satis s ON a.Aracno = s.Aracno
+WHERE a.Fiyat > 20000;
+
+SELECT m.Madres, SUM(s.Sfiyat) AS Toplam_Tutar
+FROM Musteri m
+JOIN Satis s ON m.Mno = s.Mno
+WHERE m.Madres LIKE '%Turhal%' OR m.Madres LIKE '%Amasya%'
+GROUP BY m.Madres
+ORDER BY Toplam_Tutar DESC;
+
+SELECT *
+FROM Musteri
+WHERE Mno NOT IN (SELECT Mno FROM Satis)
+AND Mno NOT IN (SELECT Mno FROM Alim);
+
+SELECT DISTINCT m.*
+FROM Satis s
+JOIN Musteri m ON s.Mno = m.Mno
+WHERE MONTH(STR_TO_DATE(s.Sat_tarih, '%d.%m.%Y')) IN (5,6);
+
+SELECT DISTINCT m.Madi, m.Msoyadi, a.Marka
+FROM Satis s
+JOIN Arac a ON s.Aracno = a.Aracno
+JOIN Musteri m ON s.Mno = m.Mno
+WHERE a.Marka IN (
+    SELECT Marka
+    FROM Arac a
+    JOIN Satis s ON a.Aracno = s.Aracno
+    GROUP BY Marka
+    HAVING COUNT(DISTINCT s.Mno) > 1
+);
+
+SELECT a.Marka, s.Sfiyat, m.Madi, m.Msoyadi
+FROM Satis s
+JOIN Arac a ON s.Aracno = a.Aracno
+JOIN Musteri m ON s.Mno = m.Mno
+WHERE s.Sfiyat = (
+    SELECT MAX(Sfiyat)
+    FROM Satis
+);
